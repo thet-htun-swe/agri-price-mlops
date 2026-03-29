@@ -1,0 +1,122 @@
+import json
+import os
+import uuid
+from datetime import datetime, timezone
+from urllib.parse import urlencode
+
+import boto3
+import requests
+
+
+s3_client = boto3.client("s3")
+
+RAW_BUCKET = os.environ["RAW_BUCKET"]
+PROJECT_NAME = os.environ.get("PROJECT_NAME", "agri-price")
+ENV_NAME = os.environ.get("ENV_NAME", "dev")
+WEATHER_API_URL = os.environ.get("WEATHER_API_URL", "https://archive-api.open-meteo.com/v1/archive")
+WEATHER_API_TIMEOUT = int(os.environ.get("WEATHER_API_TIMEOUT", "30"))
+
+
+def build_s3_key(source_name: str, fetched_at: datetime) -> str:
+    year = fetched_at.strftime("%Y")
+    month = fetched_at.strftime("%m")
+    day = fetched_at.strftime("%d")
+    unique_id = str(uuid.uuid4())
+
+    return (
+        f"source={source_name}/"
+        f"year={year}/month={month}/day={day}/"
+        f"{source_name}-{fetched_at.strftime('%Y%m%dT%H%M%SZ')}-{unique_id}.json"
+    )
+
+
+def build_response_payload(
+    source_name: str,
+    request_url: str,
+    query_params: dict,
+    status_code: int,
+    response_text: str,
+    fetched_at: datetime,
+) -> dict:
+    return {
+        "project": PROJECT_NAME,
+        "environment": ENV_NAME,
+        "source": source_name,
+        "fetched_at_utc": fetched_at.isoformat(),
+        "request_url": request_url,
+        "query_params": query_params,
+        "http_status_code": status_code,
+        "raw_response": json.loads(response_text),
+    }
+
+
+def save_to_s3(bucket_name: str, key: str, payload: dict) -> None:
+    s3_client.put_object(
+        Bucket=bucket_name,
+        Key=key,
+        Body=json.dumps(payload, ensure_ascii=False, indent=2).encode("utf-8"),
+        ContentType="application/json",
+    )
+
+
+def lambda_handler(event, context):
+    query_params = event.get("queryStringParameters") or {}
+
+    # Bangkok coordinates as default example
+    default_params = {
+        "latitude": "13.7563",
+        "longitude": "100.5018",
+        "start_date": "2025-01-01",
+        "end_date": "2025-01-31",
+        "daily": "temperature_2m_mean,precipitation_sum,relative_humidity_2m_mean",
+        "timezone": "Asia/Bangkok",
+    }
+
+    merged_params = {**default_params, **query_params}
+    encoded_params = urlencode(merged_params)
+    request_url = f"{WEATHER_API_URL}?{encoded_params}"
+
+    fetched_at = datetime.now(timezone.utc)
+
+    try:
+        response = requests.get(
+            WEATHER_API_URL,
+            params=merged_params,
+            timeout=WEATHER_API_TIMEOUT,
+        )
+        response.raise_for_status()
+
+        payload = build_response_payload(
+            source_name="weather",
+            request_url=request_url,
+            query_params=merged_params,
+            status_code=response.status_code,
+            response_text=response.text,
+            fetched_at=fetched_at,
+        )
+
+        s3_key = build_s3_key(source_name="weather", fetched_at=fetched_at)
+        save_to_s3(bucket_name=RAW_BUCKET, key=s3_key, payload=payload)
+
+        return {
+            "statusCode": 200,
+            "body": json.dumps(
+                {
+                    "message": "Weather raw data saved successfully",
+                    "bucket": RAW_BUCKET,
+                    "key": s3_key,
+                }
+            ),
+        }
+
+    except requests.RequestException as exc:
+        return {
+            "statusCode": 500,
+            "body": json.dumps(
+                {
+                    "message": "Failed to fetch weather data",
+                    "error": str(exc),
+                    "request_url": request_url,
+                }
+            ),
+        }
