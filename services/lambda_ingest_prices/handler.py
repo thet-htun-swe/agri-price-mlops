@@ -2,7 +2,7 @@ import json
 import logging
 import os
 import uuid
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 from typing import Any
 
 import boto3
@@ -26,7 +26,6 @@ DEFAULT_PRODUCT_IDS = [
     for product_id in os.environ.get("PRODUCT_IDS", "").split(",")
     if product_id.strip()
 ]
-DEFAULT_LOOKBACK_DAYS = int(os.environ.get("PRICE_LOOKBACK_DAYS", "1"))
 
 
 def build_s3_key(source_name: str, product_id: str, fetched_at: datetime) -> str:
@@ -93,62 +92,22 @@ def fetch_product_price(product_id: str, from_date: str, to_date: str):
     return response.status_code, response.json()
 
 
-def parse_event_time(event: dict) -> datetime | None:
-    event_time = event.get("time")
-    if not event_time:
-        return None
-
-    normalized_time = event_time.replace("Z", "+00:00")
-    return datetime.fromisoformat(normalized_time).astimezone(timezone.utc)
+def resolve_date_window() -> tuple[str, str]:
+    today = datetime.now(timezone.utc).date().isoformat()
+    return today, today
 
 
-def resolve_date_window(event: dict) -> tuple[str, str]:
-    from_date = event.get("from_date")
-    to_date = event.get("to_date")
-
-    if from_date and to_date:
-        return from_date, to_date
-
-    if from_date or to_date:
-        raise ValueError("Provide both from_date and to_date, or omit both")
-
-    scheduled_at = parse_event_time(event) or datetime.now(timezone.utc)
-    target_day = (scheduled_at.date() - timedelta(days=DEFAULT_LOOKBACK_DAYS)).isoformat()
-    return target_day, target_day
-
-
-def resolve_product_ids(event: dict) -> list[str]:
-    single_product_id = event.get("product_id")
-    multiple_product_ids = event.get("product_ids")
-
-    if single_product_id and multiple_product_ids:
-        raise ValueError("Provide either product_id or product_ids, not both")
-
-    if single_product_id:
-        return [single_product_id]
-
-    if multiple_product_ids:
-        return [product_id.strip() for product_id in multiple_product_ids if product_id.strip()]
-
+def resolve_product_ids() -> list[str]:
     if DEFAULT_PRODUCT_IDS:
         return DEFAULT_PRODUCT_IDS
 
-    raise ValueError("No product IDs provided in event or PRODUCT_IDS environment variable")
+    raise ValueError("No product IDs provided in PRODUCT_IDS environment variable")
 
 
 def lambda_handler(event, context):
-    event = event or {}
-
     try:
-        from_date, to_date = resolve_date_window(event)
-    except ValueError as exc:
-        return {
-            "statusCode": 400,
-            "body": json.dumps({"message": str(exc)}),
-        }
-
-    try:
-        product_ids = resolve_product_ids(event)
+        from_date, to_date = resolve_date_window()
+        product_ids = resolve_product_ids()
     except ValueError as exc:
         return {
             "statusCode": 400,

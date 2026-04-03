@@ -2,7 +2,7 @@ import json
 import logging
 import os
 import uuid
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 from urllib.parse import urlencode
 
 import boto3
@@ -62,36 +62,14 @@ def save_to_s3(bucket_name: str, key: str, payload: dict) -> None:
     )
 
 
-def parse_event_time(event: dict) -> datetime | None:
-    event_time = event.get("time")
-    if not event_time:
-        return None
-
-    normalized_time = event_time.replace("Z", "+00:00")
-    return datetime.fromisoformat(normalized_time).astimezone(timezone.utc)
-
-
-def resolve_date_window(event: dict) -> tuple[str, str]:
-    from_date = event.get("start_date")
-    to_date = event.get("end_date")
-
-    if from_date and to_date:
-        return from_date, to_date
-
-    if from_date or to_date:
-        raise ValueError("Provide both start_date and end_date, or omit both")
-
-    scheduled_at = parse_event_time(event) or datetime.now(timezone.utc)
-    target_day = (scheduled_at.date() - timedelta(days=1)).isoformat()
-    return target_day, target_day
+def resolve_date_window() -> tuple[str, str]:
+    today = datetime.now(timezone.utc).date().isoformat()
+    return today, today
 
 
 def lambda_handler(event, context):
-    event = event or {}
-    query_params = event.get("queryStringParameters") or {}
-
     try:
-        start_date, end_date = resolve_date_window(event)
+        start_date, end_date = resolve_date_window()
     except ValueError as exc:
         return {
             "statusCode": 400,
@@ -108,7 +86,7 @@ def lambda_handler(event, context):
         "timezone": "Asia/Bangkok",
     }
 
-    merged_params = {**default_params, **query_params}
+    merged_params = default_params
     encoded_params = urlencode(merged_params)
     request_url = f"{WEATHER_API_URL}?{encoded_params}"
 
