@@ -13,12 +13,12 @@ Derived from `docs/playbook.docx`, but reduced to a small, finishable scope for 
 ## Phase 0 - Foundation
 
 - [x] Confirm AWS region and one `dev` environment
-- [ ] Define simple naming convention for bucket, Lambdas, Glue job, and model artifacts
-- [ ] Define minimal S3 layout:
+- [x] Define simple naming convention for bucket, Lambdas, Glue job, and model artifacts
+- [x] Define minimal S3 layout:
   - [x] `raw/price/`
   - [x] `raw/weather/`
-  - [ ] `processed/features/`
-  - [ ] `artifacts/model/`
+  - [x] `processed/features/`
+  - [x] `artifacts/model/`
 - [ ] Decide the single product / target to use for the demo
 - [ ] Define the minimum schema needed for raw and processed data
 
@@ -30,10 +30,10 @@ Derived from `docs/playbook.docx`, but reduced to a small, finishable scope for 
 - [x] Complete price ingestion Lambda
 - [x] Complete weather ingestion Lambda
 - [x] Ensure both Lambdas save raw API responses to S3
-- [ ] Add simple logs:
-  - [ ] request date
-  - [ ] status code
-  - [ ] S3 object key
+- [x] Add simple logs:
+  - [x] request date
+  - [x] status code
+  - [x] S3 object key
 - [x] Test price ingestion manually
 - [x] Test weather ingestion manually
 - [x] Verify raw files landed in S3
