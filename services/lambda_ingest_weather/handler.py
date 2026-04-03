@@ -1,7 +1,7 @@
 import json
 import os
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from urllib.parse import urlencode
 
 import boto3
@@ -59,15 +59,48 @@ def save_to_s3(bucket_name: str, key: str, payload: dict) -> None:
     )
 
 
+def parse_event_time(event: dict) -> datetime | None:
+    event_time = event.get("time")
+    if not event_time:
+        return None
+
+    normalized_time = event_time.replace("Z", "+00:00")
+    return datetime.fromisoformat(normalized_time).astimezone(timezone.utc)
+
+
+def resolve_date_window(event: dict) -> tuple[str, str]:
+    from_date = event.get("start_date")
+    to_date = event.get("end_date")
+
+    if from_date and to_date:
+        return from_date, to_date
+
+    if from_date or to_date:
+        raise ValueError("Provide both start_date and end_date, or omit both")
+
+    scheduled_at = parse_event_time(event) or datetime.now(timezone.utc)
+    target_day = (scheduled_at.date() - timedelta(days=1)).isoformat()
+    return target_day, target_day
+
+
 def lambda_handler(event, context):
+    event = event or {}
     query_params = event.get("queryStringParameters") or {}
+
+    try:
+        start_date, end_date = resolve_date_window(event)
+    except ValueError as exc:
+        return {
+            "statusCode": 400,
+            "body": json.dumps({"message": str(exc)}),
+        }
 
     # Bangkok coordinates as default example
     default_params = {
         "latitude": "13.7563",
         "longitude": "100.5018",
-        "start_date": "2025-01-01",
-        "end_date": "2025-01-31",
+        "start_date": start_date,
+        "end_date": end_date,
         "daily": "temperature_2m_mean,precipitation_sum,relative_humidity_2m_mean",
         "timezone": "Asia/Bangkok",
     }

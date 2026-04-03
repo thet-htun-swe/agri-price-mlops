@@ -1,7 +1,7 @@
 import json
 import os
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from typing import Any
 
 import boto3
@@ -23,6 +23,7 @@ DEFAULT_PRODUCT_IDS = [
     for product_id in os.environ.get("PRODUCT_IDS", "").split(",")
     if product_id.strip()
 ]
+DEFAULT_LOOKBACK_DAYS = int(os.environ.get("PRICE_LOOKBACK_DAYS", "1"))
 
 
 def build_s3_key(source_name: str, product_id: str, fetched_at: datetime) -> str:
@@ -89,6 +90,30 @@ def fetch_product_price(product_id: str, from_date: str, to_date: str):
     return response.status_code, response.json()
 
 
+def parse_event_time(event: dict) -> datetime | None:
+    event_time = event.get("time")
+    if not event_time:
+        return None
+
+    normalized_time = event_time.replace("Z", "+00:00")
+    return datetime.fromisoformat(normalized_time).astimezone(timezone.utc)
+
+
+def resolve_date_window(event: dict) -> tuple[str, str]:
+    from_date = event.get("from_date")
+    to_date = event.get("to_date")
+
+    if from_date and to_date:
+        return from_date, to_date
+
+    if from_date or to_date:
+        raise ValueError("Provide both from_date and to_date, or omit both")
+
+    scheduled_at = parse_event_time(event) or datetime.now(timezone.utc)
+    target_day = (scheduled_at.date() - timedelta(days=DEFAULT_LOOKBACK_DAYS)).isoformat()
+    return target_day, target_day
+
+
 def resolve_product_ids(event: dict) -> list[str]:
     single_product_id = event.get("product_id")
     multiple_product_ids = event.get("product_ids")
@@ -109,15 +134,14 @@ def resolve_product_ids(event: dict) -> list[str]:
 
 
 def lambda_handler(event, context):
-    from_date = event.get("from_date")
-    to_date = event.get("to_date")
+    event = event or {}
 
-    if not from_date or not to_date:
+    try:
+        from_date, to_date = resolve_date_window(event)
+    except ValueError as exc:
         return {
             "statusCode": 400,
-            "body": json.dumps(
-                {"message": "Missing required fields: from_date and to_date"}
-            ),
+            "body": json.dumps({"message": str(exc)}),
         }
 
     try:
