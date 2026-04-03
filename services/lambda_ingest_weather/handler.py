@@ -1,4 +1,5 @@
 import json
+import logging
 import os
 import uuid
 from datetime import datetime, timedelta, timezone
@@ -9,6 +10,8 @@ import requests
 
 
 s3_client = boto3.client("s3")
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 RAW_BUCKET = os.environ["RAW_BUCKET"]
 PROJECT_NAME = os.environ.get("PROJECT_NAME", "agri-price")
@@ -131,6 +134,18 @@ def lambda_handler(event, context):
         s3_key = build_s3_key(source_name="weather", fetched_at=fetched_at)
         save_to_s3(bucket_name=RAW_BUCKET, key=s3_key, payload=payload)
 
+        logger.info(
+            json.dumps(
+                {
+                    "message": "weather_ingestion_saved",
+                    "request_date": start_date,
+                    "status_code": response.status_code,
+                    "s3_key": s3_key,
+                },
+                ensure_ascii=False,
+            )
+        )
+
         return {
             "statusCode": 200,
             "body": json.dumps(
@@ -143,6 +158,17 @@ def lambda_handler(event, context):
         }
 
     except requests.RequestException as exc:
+        logger.exception(
+            json.dumps(
+                {
+                    "message": "weather_ingestion_failed",
+                    "request_date": start_date,
+                    "error": str(exc),
+                    "request_url": request_url,
+                },
+                ensure_ascii=False,
+            )
+        )
         return {
             "statusCode": 500,
             "body": json.dumps(

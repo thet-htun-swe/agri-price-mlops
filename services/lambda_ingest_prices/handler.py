@@ -1,4 +1,5 @@
 import json
+import logging
 import os
 import uuid
 from datetime import datetime, timedelta, timezone
@@ -9,6 +10,8 @@ import requests
 
 
 s3_client = boto3.client("s3")
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 RAW_BUCKET = os.environ["RAW_BUCKET"]
 PROJECT_NAME = os.environ.get("PROJECT_NAME", "agri-price")
@@ -186,6 +189,19 @@ def lambda_handler(event, context):
                 payload=payload,
             )
 
+            logger.info(
+                json.dumps(
+                    {
+                        "message": "price_ingestion_saved",
+                        "request_date": from_date,
+                        "status_code": status_code,
+                        "s3_key": s3_key,
+                        "product_id": product_id,
+                    },
+                    ensure_ascii=False,
+                )
+            )
+
             results.append(
                 {
                     "product_id": product_id,
@@ -196,6 +212,17 @@ def lambda_handler(event, context):
             )
 
         except requests.RequestException as exc:
+            logger.exception(
+                json.dumps(
+                    {
+                        "message": "price_ingestion_failed",
+                        "request_date": from_date,
+                        "product_id": product_id,
+                        "error": str(exc),
+                    },
+                    ensure_ascii=False,
+                )
+            )
             failed.append(
                 {
                     "product_id": product_id,
@@ -204,6 +231,17 @@ def lambda_handler(event, context):
                 }
             )
         except Exception as exc:
+            logger.exception(
+                json.dumps(
+                    {
+                        "message": "price_ingestion_failed",
+                        "request_date": from_date,
+                        "product_id": product_id,
+                        "error": str(exc),
+                    },
+                    ensure_ascii=False,
+                )
+            )
             failed.append(
                 {
                     "product_id": product_id,
