@@ -6,8 +6,8 @@ Derived from `docs/playbook.docx`, but reduced to a small, finishable scope for 
 
 - [x] Keep only one environment: `dev`
 - [ ] Keep only one working end-to-end pipeline
-- [ ] Start with one vegetable / product only
-- [ ] Start with one daily prediction target only
+- [x] Use multi-product data in the ETL table
+- [ ] Keep the first modeling target limited to one product column
 - [x] Prefer simple working implementation over production-grade design
 
 ## Phase 0 - Foundation
@@ -19,8 +19,8 @@ Derived from `docs/playbook.docx`, but reduced to a small, finishable scope for 
   - [x] `raw/weather/`
   - [x] `processed/features/`
   - [x] `artifacts/model/`
-- [ ] Decide the single product / target to use for the demo
-- [ ] Define the minimum schema needed for raw and processed data
+- [x] Decide the product set to include in the demo
+- [x] Define the minimum schema needed for raw and processed data
 
 ## Phase A - Raw Ingestion
 
@@ -41,14 +41,14 @@ Derived from `docs/playbook.docx`, but reduced to a small, finishable scope for 
 
 ## Phase B - Prepare Dataset
 
-- [ ] Read raw price data
-- [ ] Read raw weather data
-- [ ] Clean and standardize key fields
-- [ ] Standardize date format
-- [ ] Join price and weather on date
-- [ ] Create one simple feature table
-- [ ] Save processed dataset to S3
-- [ ] Validate final columns and schema
+- [x] Read raw price data
+- [x] Read raw weather data
+- [x] Clean and standardize key fields
+- [x] Standardize date format
+- [x] Join price and weather on date
+- [x] Create one simple feature table
+- [x] Save processed dataset to S3
+- [x] Validate final columns and schema
 
 ## Phase C - Train Baseline Model
 
