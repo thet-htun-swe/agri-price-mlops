@@ -5,6 +5,8 @@ __pycache__/
 # Local test and verification scratch
 .pytest_tmp/
 .phase_b_verify_*/
+.phase_c_verify/
+.phase_c_multi_verify/
 pytest-cache-files-*/
 
 # Local packaged artifacts
