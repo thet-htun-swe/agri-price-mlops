@@ -239,4 +239,5 @@ def upload_bundle_to_s3(
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    main()
+
