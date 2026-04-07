@@ -1,0 +1,27 @@
+# Python caches
+__pycache__/
+*.py[cod]
+
+# Local test and verification scratch
+.pytest_tmp/
+.phase_b_verify_*/
+pytest-cache-files-*/
+
+# Local packaged artifacts
+*.zip
+
+# Environment files
+.env
+.env.*
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+
+# Local raw and processed data artifacts
+data/raw/
+data/processed/
+
+# Keep mapping tables tracked
+!data/product_mapping/
+!data/product_mapping/*.csv
