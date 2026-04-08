@@ -3,11 +3,9 @@ import logging
 import os
 import uuid
 from datetime import datetime, timezone
-from typing import Any
 
 import boto3
 import requests
-
 
 s3_client = boto3.client("s3")
 logger = logging.getLogger(__name__)
@@ -28,7 +26,7 @@ DEFAULT_PRODUCT_IDS = [
 ]
 
 
-def build_s3_key(source_name: str, product_id: str, fetched_at: datetime) -> str:
+def build_price_object_key(product_id: str, fetched_at: datetime) -> str:
     year = fetched_at.strftime("%Y")
     month = fetched_at.strftime("%m")
     day = fetched_at.strftime("%d")
@@ -36,28 +34,32 @@ def build_s3_key(source_name: str, product_id: str, fetched_at: datetime) -> str
     unique_id = str(uuid.uuid4())
 
     return (
-        f"source={source_name}/"
+        "source=price/"
         f"year={year}/month={month}/day={day}/"
         f"product_id={product_id}/"
-        f"{source_name}-{product_id}-{timestamp}-{unique_id}.json"
+        f"price-{product_id}-{timestamp}-{unique_id}.json"
     )
 
 
-def build_payload(
+def build_price_payload(
+    *,
+    project_name: str,
+    environment_name: str,
+    api_url: str,
     product_id: str,
     from_date: str,
     to_date: str,
     status_code: int,
-    response_json: Any,
+    response_json: dict,
     fetched_at: datetime,
 ) -> dict:
     return {
-        "project": PROJECT_NAME,
-        "environment": ENV_NAME,
+        "project": project_name,
+        "environment": environment_name,
         "source": "price",
         "fetched_at_utc": fetched_at.isoformat(),
         "request": {
-            "url": PRICE_API_URL,
+            "url": api_url,
             "params": {
                 "product_id": product_id,
                 "from_date": from_date,
@@ -127,7 +129,10 @@ def lambda_handler(event, context):
                 to_date=to_date,
             )
 
-            payload = build_payload(
+            payload = build_price_payload(
+                project_name=PROJECT_NAME,
+                environment_name=ENV_NAME,
+                api_url=PRICE_API_URL,
                 product_id=product_id,
                 from_date=from_date,
                 to_date=to_date,
@@ -136,8 +141,7 @@ def lambda_handler(event, context):
                 fetched_at=fetched_at,
             )
 
-            s3_key = build_s3_key(
-                source_name="price",
+            s3_key = build_price_object_key(
                 product_id=product_id,
                 fetched_at=fetched_at,
             )

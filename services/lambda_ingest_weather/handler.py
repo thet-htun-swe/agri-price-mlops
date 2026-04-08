@@ -8,7 +8,6 @@ from urllib.parse import urlencode
 import boto3
 import requests
 
-
 s3_client = boto3.client("s3")
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -20,31 +19,33 @@ WEATHER_API_URL = os.environ.get("WEATHER_API_URL", "https://archive-api.open-me
 WEATHER_API_TIMEOUT = int(os.environ.get("WEATHER_API_TIMEOUT", "30"))
 
 
-def build_s3_key(source_name: str, fetched_at: datetime) -> str:
+def build_weather_object_key(fetched_at: datetime) -> str:
     year = fetched_at.strftime("%Y")
     month = fetched_at.strftime("%m")
     day = fetched_at.strftime("%d")
     unique_id = str(uuid.uuid4())
 
     return (
-        f"source={source_name}/"
+        "source=weather/"
         f"year={year}/month={month}/day={day}/"
-        f"{source_name}-{fetched_at.strftime('%Y%m%dT%H%M%SZ')}-{unique_id}.json"
+        f"weather-{fetched_at.strftime('%Y%m%dT%H%M%SZ')}-{unique_id}.json"
     )
 
 
-def build_response_payload(
-    source_name: str,
+def build_weather_payload(
+    *,
+    project_name: str,
+    environment_name: str,
     request_url: str,
-    query_params: dict,
+    query_params: dict[str, str],
     status_code: int,
     response_text: str,
     fetched_at: datetime,
 ) -> dict:
     return {
-        "project": PROJECT_NAME,
-        "environment": ENV_NAME,
-        "source": source_name,
+        "project": project_name,
+        "environment": environment_name,
+        "source": "weather",
         "fetched_at_utc": fetched_at.isoformat(),
         "request_url": request_url,
         "query_params": query_params,
@@ -100,8 +101,9 @@ def lambda_handler(event, context):
         )
         response.raise_for_status()
 
-        payload = build_response_payload(
-            source_name="weather",
+        payload = build_weather_payload(
+            project_name=PROJECT_NAME,
+            environment_name=ENV_NAME,
             request_url=request_url,
             query_params=merged_params,
             status_code=response.status_code,
@@ -109,7 +111,7 @@ def lambda_handler(event, context):
             fetched_at=fetched_at,
         )
 
-        s3_key = build_s3_key(source_name="weather", fetched_at=fetched_at)
+        s3_key = build_weather_object_key(fetched_at=fetched_at)
         save_to_s3(bucket_name=RAW_BUCKET, key=s3_key, payload=payload)
 
         logger.info(
