@@ -52,51 +52,57 @@ Derived from `docs/playbook.docx` and updated to reflect the current implementat
 - [x] Save processed dataset to S3
 - [x] Validate final columns and schema
 
-## Phase C - Train Forecasting Model
+## Phase C - Prototype Local Training
 
 - [x] Load processed dataset
 - [x] Split data with time-aware train/validation logic
-- [x] Train one multi-output model
+- [x] Train one multi-output prototype model locally
 - [x] Evaluate against baseline models
 - [x] Save trained model artifact
 - [x] Save evaluation result
 
-## Phase D - Inference and Deployment
+## Phase D - Cloud ML Pipeline
 
-- [ ] Run prediction from the trained model
+- [ ] Convert Phase C training code into a SageMaker-compatible training step
+- [ ] Create SageMaker evaluation step
+- [ ] Create SageMaker registration step
+- [ ] Define SageMaker `Train -> Evaluate -> Register` pipeline
+- [ ] Create SageMaker model package group
+- [ ] Run SageMaker pipeline manually once
+- [ ] Confirm one registered model version exists in SageMaker
+
+## Phase E - Inference and Deployment
+
+- [ ] Run prediction from the registered model
 - [ ] Save prediction output to file or S3
 - [ ] Show model version or artifact path in the output
-- [ ] Package model artifact for SageMaker
-- [ ] Upload model artifact to S3
-- [ ] Register model in SageMaker Model Registry
 - [ ] Define endpoint deployment path
 - [ ] Prepare one demo flow that can be presented clearly
 
-## Phase E - Monitoring and Retraining
+## Phase F - Monitoring and Retraining
 
 - [ ] Save prediction outputs for monitoring
 - [ ] Build actual-vs-predicted comparison dataset
 - [ ] Query actual-vs-predicted with Athena
 - [ ] Publish monitoring metrics to CloudWatch
-- [ ] Add retraining trigger path
+- [ ] Add EventBridge trigger for SageMaker Pipeline execution
+- [ ] Add fully automated cloud retraining path
 
-## Phase F - Documentation
+## Phase G - Documentation
 
 - [ ] Write setup steps
 - [ ] Write run steps for ingestion
 - [ ] Write run steps for preprocessing
-- [ ] Write run steps for training
-- [ ] Write run steps for prediction/deployment
-- [ ] Write run steps for monitoring/retraining
+- [ ] Write run steps for SageMaker training pipeline
+- [ ] Write run steps for prediction and deployment
+- [ ] Write run steps for monitoring and retraining
 - [ ] Write brief architecture summary
 
 ## Optional Only If Time Remains
 
-- [ ] Replace preprocessing script with Glue job if not already done
 - [ ] Package infrastructure with Terraform
 - [ ] Add dead-letter queue for Lambda failures
-- [ ] Add CloudWatch metrics
-- [ ] Add simple retraining trigger
+- [ ] Add CloudWatch metrics dashboards
 - [ ] Add separate `prod` config
 
 ## Demo Definition of Done
@@ -104,8 +110,10 @@ Derived from `docs/playbook.docx` and updated to reflect the current implementat
 - [x] Price data is ingested into S3 raw
 - [x] Weather data is ingested into S3 raw
 - [x] One processed dataset is produced
-- [x] One model is trained successfully
-- [ ] One prediction output is generated
+- [x] One prototype model is trained successfully
+- [ ] One SageMaker `Train -> Evaluate -> Register` pipeline runs successfully
 - [ ] One registered model exists in SageMaker
+- [ ] One prediction output is generated from the registered model
 - [ ] Monitoring path for actual vs predicted is defined
-- [ ] The full MVP flow can be explained and demonstrated end-to-end
+- [ ] Automated cloud retraining path is defined
+- [ ] The full proposal-aligned flow can be explained and demonstrated end-to-end

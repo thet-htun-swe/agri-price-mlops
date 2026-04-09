@@ -27,3 +27,10 @@ data/processed/
 # Keep mapping tables tracked
 !data/product_mapping/
 !data/product_mapping/*.csv
+
+.vscode/
+
+artifacts
+
+proposal.docx
+playbook.docx

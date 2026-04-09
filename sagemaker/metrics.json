@@ -1,0 +1,30 @@
+{
+  "overall": {
+    "mae": 4.815112088488034,
+    "rmse": 7.826764304462683
+  },
+  "by_target": {
+    "target_next_day_price_coriander": {
+      "mae": 11.357407415100417,
+      "rmse": 14.914925240719056
+    },
+    "target_next_day_price_kale": {
+      "mae": 2.1992259000608434,
+      "rmse": 3.057050037357775
+    },
+    "target_next_day_price_lime": {
+      "mae": 0.21427975150303066,
+      "rmse": 0.3170482247352376
+    },
+    "target_next_day_price_orange": {
+      "mae": 1.919824829900452,
+      "rmse": 2.920902710904161
+    },
+    "target_next_day_price_red_chili": {
+      "mae": 8.38482254587543,
+      "rmse": 17.92389530859719
+    }
+  },
+  "train_rows": 760,
+  "validation_rows": 191
+}

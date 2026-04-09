@@ -1,0 +1,401 @@
+{
+  "evaluation_type": "walk_forward",
+  "target_columns": [
+    "target_next_day_price_coriander",
+    "target_next_day_price_kale",
+    "target_next_day_price_lime",
+    "target_next_day_price_orange",
+    "target_next_day_price_red_chili"
+  ],
+  "feature_count": 80,
+  "window_count": 3,
+  "models": {
+    "xgboost": {
+      "folds": [
+        {
+          "fold": 1,
+          "overall": {
+            "mae": 4.687048584254,
+            "rmse": 7.189577500733047
+          },
+          "by_target": {
+            "target_next_day_price_coriander": {
+              "mae": 11.213247768541905,
+              "rmse": 17.898380229134837
+            },
+            "target_next_day_price_kale": {
+              "mae": 4.008904142529553,
+              "rmse": 6.588389260524816
+            },
+            "target_next_day_price_lime": {
+              "mae": 0.41273573805524416,
+              "rmse": 0.4732659664232762
+            },
+            "target_next_day_price_orange": {
+              "mae": 3.6673919817540033,
+              "rmse": 4.983891095516457
+            },
+            "target_next_day_price_red_chili": {
+              "mae": 4.132963290389296,
+              "rmse": 6.003960952065848
+            }
+          },
+          "train_rows": 378,
+          "validation_rows": 191
+        },
+        {
+          "fold": 2,
+          "overall": {
+            "mae": 4.153062105178833,
+            "rmse": 5.720060672697093
+          },
+          "by_target": {
+            "target_next_day_price_coriander": {
+              "mae": 10.959311759908786,
+              "rmse": 14.928738928772207
+            },
+            "target_next_day_price_kale": {
+              "mae": 3.4688512192970795,
+              "rmse": 4.526786707647984
+            },
+            "target_next_day_price_lime": {
+              "mae": 0.250701114145249,
+              "rmse": 0.3162474216674653
+            },
+            "target_next_day_price_orange": {
+              "mae": 3.2369927011859354,
+              "rmse": 4.423253006760515
+            },
+            "target_next_day_price_red_chili": {
+              "mae": 2.849453731357115,
+              "rmse": 4.405277298637291
+            }
+          },
+          "train_rows": 569,
+          "validation_rows": 191
+        },
+        {
+          "fold": 3,
+          "overall": {
+            "mae": 4.815112088488034,
+            "rmse": 7.826764304462683
+          },
+          "by_target": {
+            "target_next_day_price_coriander": {
+              "mae": 11.357407415100417,
+              "rmse": 14.914925240719056
+            },
+            "target_next_day_price_kale": {
+              "mae": 2.1992259000608434,
+              "rmse": 3.057050037357775
+            },
+            "target_next_day_price_lime": {
+              "mae": 0.21427975150303066,
+              "rmse": 0.3170482247352376
+            },
+            "target_next_day_price_orange": {
+              "mae": 1.919824829900452,
+              "rmse": 2.920902710904161
+            },
+            "target_next_day_price_red_chili": {
+              "mae": 8.38482254587543,
+              "rmse": 17.92389530859719
+            }
+          },
+          "train_rows": 760,
+          "validation_rows": 191
+        }
+      ],
+      "overall": {
+        "mean_mae": 4.551740925973623,
+        "mean_rmse": 6.912134159297608
+      },
+      "by_target": {
+        "target_next_day_price_coriander": {
+          "mean_mae": 11.17665564785037,
+          "mean_rmse": 15.914014799542032
+        },
+        "target_next_day_price_kale": {
+          "mean_mae": 3.225660420629159,
+          "mean_rmse": 4.724075335176859
+        },
+        "target_next_day_price_lime": {
+          "mean_mae": 0.29257220123450794,
+          "mean_rmse": 0.368853870941993
+        },
+        "target_next_day_price_orange": {
+          "mean_mae": 2.941403170946797,
+          "mean_rmse": 4.109348937727044
+        },
+        "target_next_day_price_red_chili": {
+          "mean_mae": 5.12241318920728,
+          "mean_rmse": 9.444377853100109
+        }
+      }
+    },
+    "persistence": {
+      "folds": [
+        {
+          "fold": 1,
+          "overall": {
+            "mae": 1.9162303664921467,
+            "rmse": 4.4161611147777755
+          },
+          "by_target": {
+            "target_next_day_price_coriander": {
+              "mae": 5.654450261780105,
+              "rmse": 11.853711283989858
+            },
+            "target_next_day_price_kale": {
+              "mae": 1.806282722513089,
+              "rmse": 3.785823653180942
+            },
+            "target_next_day_price_lime": {
+              "mae": 0.05235602094240838,
+              "rmse": 0.17538290197070217
+            },
+            "target_next_day_price_orange": {
+              "mae": 0.6282722513089005,
+              "rmse": 2.3861511430516953
+            },
+            "target_next_day_price_red_chili": {
+              "mae": 1.4397905759162304,
+              "rmse": 3.8797365916956794
+            }
+          },
+          "train_rows": 378,
+          "validation_rows": 191
+        },
+        {
+          "fold": 2,
+          "overall": {
+            "mae": 2.1219895287958113,
+            "rmse": 4.109332130760626
+          },
+          "by_target": {
+            "target_next_day_price_coriander": {
+              "mae": 7.303664921465969,
+              "rmse": 11.845426802173675
+            },
+            "target_next_day_price_kale": {
+              "mae": 1.3769633507853403,
+              "rmse": 3.1369274993416174
+            },
+            "target_next_day_price_lime": {
+              "mae": 0.04450261780104712,
+              "rmse": 0.16380616817746604
+            },
+            "target_next_day_price_orange": {
+              "mae": 0.4319371727748691,
+              "rmse": 1.7065472934910026
+            },
+            "target_next_day_price_red_chili": {
+              "mae": 1.4528795811518325,
+              "rmse": 3.693952890619368
+            }
+          },
+          "train_rows": 569,
+          "validation_rows": 191
+        },
+        {
+          "fold": 3,
+          "overall": {
+            "mae": 1.93717277486911,
+            "rmse": 4.119932106310957
+          },
+          "by_target": {
+            "target_next_day_price_coriander": {
+              "mae": 5.654450261780105,
+              "rmse": 9.530881194049087
+            },
+            "target_next_day_price_kale": {
+              "mae": 1.1780104712041886,
+              "rmse": 2.81404480553158
+            },
+            "target_next_day_price_lime": {
+              "mae": 0.05235602094240838,
+              "rmse": 0.17161078573360333
+            },
+            "target_next_day_price_orange": {
+              "mae": 0.56282722513089,
+              "rmse": 2.163173449293364
+            },
+            "target_next_day_price_red_chili": {
+              "mae": 2.238219895287958,
+              "rmse": 5.919950296947146
+            }
+          },
+          "train_rows": 760,
+          "validation_rows": 191
+        }
+      ],
+      "overall": {
+        "mean_mae": 1.991797556719023,
+        "mean_rmse": 4.215141783949786
+      },
+      "by_target": {
+        "target_next_day_price_coriander": {
+          "mean_mae": 6.204188481675392,
+          "mean_rmse": 11.076673093404205
+        },
+        "target_next_day_price_kale": {
+          "mean_mae": 1.4537521815008727,
+          "mean_rmse": 3.245598652684713
+        },
+        "target_next_day_price_lime": {
+          "mean_mae": 0.049738219895287955,
+          "mean_rmse": 0.1702666186272572
+        },
+        "target_next_day_price_orange": {
+          "mean_mae": 0.5410122164048866,
+          "mean_rmse": 2.0852906286120203
+        },
+        "target_next_day_price_red_chili": {
+          "mean_mae": 1.7102966841186735,
+          "mean_rmse": 4.4978799264207305
+        }
+      }
+    },
+    "seasonal_naive": {
+      "folds": [
+        {
+          "fold": 1,
+          "overall": {
+            "mae": 8.025130890052356,
+            "rmse": 12.730521085238768
+          },
+          "by_target": {
+            "target_next_day_price_coriander": {
+              "mae": 21.57068062827225,
+              "rmse": 34.29640586850731
+            },
+            "target_next_day_price_kale": {
+              "mae": 6.9109947643979055,
+              "rmse": 10.280744976775122
+            },
+            "target_next_day_price_lime": {
+              "mae": 0.3612565445026178,
+              "rmse": 0.5748890172885136
+            },
+            "target_next_day_price_orange": {
+              "mae": 4.18848167539267,
+              "rmse": 6.850115602647411
+            },
+            "target_next_day_price_red_chili": {
+              "mae": 7.0942408376963355,
+              "rmse": 11.650449960975486
+            }
+          },
+          "train_rows": 378,
+          "validation_rows": 191
+        },
+        {
+          "fold": 2,
+          "overall": {
+            "mae": 8.184816753926702,
+            "rmse": 11.907567944705256
+          },
+          "by_target": {
+            "target_next_day_price_coriander": {
+              "mae": 27.172774869109947,
+              "rmse": 37.09951947869053
+            },
+            "target_next_day_price_kale": {
+              "mae": 4.68848167539267,
+              "rmse": 7.229683575878673
+            },
+            "target_next_day_price_lime": {
+              "mae": 0.2931937172774869,
+              "rmse": 0.528011185031458
+            },
+            "target_next_day_price_orange": {
+              "mae": 2.8664921465968587,
+              "rmse": 4.741346485139701
+            },
+            "target_next_day_price_red_chili": {
+              "mae": 5.903141361256544,
+              "rmse": 9.939278998785918
+            }
+          },
+          "train_rows": 569,
+          "validation_rows": 191
+        },
+        {
+          "fold": 3,
+          "overall": {
+            "mae": 9.29738219895288,
+            "rmse": 14.664874305587528
+          },
+          "by_target": {
+            "target_next_day_price_coriander": {
+              "mae": 27.356020942408378,
+              "rmse": 38.3016410458649
+            },
+            "target_next_day_price_kale": {
+              "mae": 5.222513089005235,
+              "rmse": 7.228959358243852
+            },
+            "target_next_day_price_lime": {
+              "mae": 0.3743455497382199,
+              "rmse": 0.5794247011417392
+            },
+            "target_next_day_price_orange": {
+              "mae": 3.992146596858639,
+              "rmse": 6.564720080720875
+            },
+            "target_next_day_price_red_chili": {
+              "mae": 9.541884816753926,
+              "rmse": 20.64962634196627
+            }
+          },
+          "train_rows": 760,
+          "validation_rows": 191
+        }
+      ],
+      "overall": {
+        "mean_mae": 8.502443280977312,
+        "mean_rmse": 13.10098777851052
+      },
+      "by_target": {
+        "target_next_day_price_coriander": {
+          "mean_mae": 25.36649214659686,
+          "mean_rmse": 36.56585546435425
+        },
+        "target_next_day_price_kale": {
+          "mean_mae": 5.607329842931937,
+          "mean_rmse": 8.246462636965882
+        },
+        "target_next_day_price_lime": {
+          "mean_mae": 0.34293193717277487,
+          "mean_rmse": 0.5607749678205702
+        },
+        "target_next_day_price_orange": {
+          "mean_mae": 3.6823734729493895,
+          "mean_rmse": 6.0520607228359955
+        },
+        "target_next_day_price_red_chili": {
+          "mean_mae": 7.513089005235602,
+          "mean_rmse": 14.07978510057589
+        }
+      }
+    }
+  },
+  "ranking_by_mean_mae": [
+    {
+      "model_name": "persistence",
+      "mean_mae": 1.991797556719023,
+      "mean_rmse": 4.215141783949786
+    },
+    {
+      "model_name": "xgboost",
+      "mean_mae": 4.551740925973623,
+      "mean_rmse": 6.912134159297608
+    },
+    {
+      "model_name": "seasonal_naive",
+      "mean_mae": 8.502443280977312,
+      "mean_rmse": 13.10098777851052
+    }
+  ],
+  "winner": "persistence"
+}

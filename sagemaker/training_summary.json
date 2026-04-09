@@ -1,0 +1,153 @@
+{
+  "model_name": "multi_output_xgboost",
+  "algorithm": "sklearn.multioutput.MultiOutputRegressor(xgboost.XGBRegressor)",
+  "trained_at_utc": "2026-04-07T18:43:27Z",
+  "target_columns": [
+    "target_next_day_price_coriander",
+    "target_next_day_price_kale",
+    "target_next_day_price_lime",
+    "target_next_day_price_orange",
+    "target_next_day_price_red_chili"
+  ],
+  "feature_columns": [
+    "temperature_2m_mean",
+    "precipitation_sum",
+    "relative_humidity_2m_mean",
+    "price_coriander",
+    "price_kale",
+    "price_lime",
+    "price_orange",
+    "price_red_chili",
+    "precipitation_sum_was_missing",
+    "price_coriander_was_missing",
+    "price_kale_was_missing",
+    "price_lime_was_missing",
+    "price_orange_was_missing",
+    "price_red_chili_was_missing",
+    "relative_humidity_2m_mean_was_missing",
+    "temperature_2m_mean_was_missing",
+    "precipitation_sum_lag_1",
+    "precipitation_sum_lag_14",
+    "precipitation_sum_lag_28",
+    "precipitation_sum_lag_7",
+    "price_coriander_lag_1",
+    "price_coriander_lag_14",
+    "price_coriander_lag_28",
+    "price_coriander_lag_7",
+    "price_kale_lag_1",
+    "price_kale_lag_14",
+    "price_kale_lag_28",
+    "price_kale_lag_7",
+    "price_lime_lag_1",
+    "price_lime_lag_14",
+    "price_lime_lag_28",
+    "price_lime_lag_7",
+    "price_orange_lag_1",
+    "price_orange_lag_14",
+    "price_orange_lag_28",
+    "price_orange_lag_7",
+    "price_red_chili_lag_1",
+    "price_red_chili_lag_14",
+    "price_red_chili_lag_28",
+    "price_red_chili_lag_7",
+    "relative_humidity_2m_mean_lag_1",
+    "relative_humidity_2m_mean_lag_14",
+    "relative_humidity_2m_mean_lag_28",
+    "relative_humidity_2m_mean_lag_7",
+    "temperature_2m_mean_lag_1",
+    "temperature_2m_mean_lag_14",
+    "temperature_2m_mean_lag_28",
+    "temperature_2m_mean_lag_7",
+    "precipitation_sum_rolling_mean_14",
+    "precipitation_sum_rolling_mean_3",
+    "precipitation_sum_rolling_mean_7",
+    "price_coriander_rolling_mean_14",
+    "price_coriander_rolling_mean_3",
+    "price_coriander_rolling_mean_7",
+    "price_kale_rolling_mean_14",
+    "price_kale_rolling_mean_3",
+    "price_kale_rolling_mean_7",
+    "price_lime_rolling_mean_14",
+    "price_lime_rolling_mean_3",
+    "price_lime_rolling_mean_7",
+    "price_orange_rolling_mean_14",
+    "price_orange_rolling_mean_3",
+    "price_orange_rolling_mean_7",
+    "price_red_chili_rolling_mean_14",
+    "price_red_chili_rolling_mean_3",
+    "price_red_chili_rolling_mean_7",
+    "relative_humidity_2m_mean_rolling_mean_14",
+    "relative_humidity_2m_mean_rolling_mean_3",
+    "relative_humidity_2m_mean_rolling_mean_7",
+    "temperature_2m_mean_rolling_mean_14",
+    "temperature_2m_mean_rolling_mean_3",
+    "temperature_2m_mean_rolling_mean_7",
+    "day_of_month",
+    "day_of_week",
+    "week_of_year",
+    "day_of_year",
+    "quarter",
+    "is_weekend",
+    "year",
+    "month"
+  ],
+  "training_date_range": {
+    "start_date": "2022-01-03",
+    "end_date": "2025-12-29"
+  },
+  "holdout_train_date_range": {
+    "start_date": "2022-01-03",
+    "end_date": "2025-03-11"
+  },
+  "holdout_validation_date_range": {
+    "start_date": "2025-03-12",
+    "end_date": "2025-12-29"
+  },
+  "config": {
+    "validation_fraction": 0.2,
+    "min_validation_rows": 14,
+    "min_training_rows": 30,
+    "random_state": 42,
+    "seasonal_period": 7,
+    "walk_forward_windows": 3,
+    "xgb_n_estimators": 300,
+    "xgb_max_depth": 6,
+    "xgb_learning_rate": 0.05,
+    "xgb_subsample": 0.9,
+    "xgb_colsample_bytree": 0.9,
+    "xgb_reg_lambda": 1.0,
+    "target_columns": []
+  },
+  "metrics": {
+    "overall": {
+      "mae": 4.815112088488034,
+      "rmse": 7.826764304462683
+    },
+    "by_target": {
+      "target_next_day_price_coriander": {
+        "mae": 11.357407415100417,
+        "rmse": 14.914925240719056
+      },
+      "target_next_day_price_kale": {
+        "mae": 2.1992259000608434,
+        "rmse": 3.057050037357775
+      },
+      "target_next_day_price_lime": {
+        "mae": 0.21427975150303066,
+        "rmse": 0.3170482247352376
+      },
+      "target_next_day_price_orange": {
+        "mae": 1.919824829900452,
+        "rmse": 2.920902710904161
+      },
+      "target_next_day_price_red_chili": {
+        "mae": 8.38482254587543,
+        "rmse": 17.92389530859719
+      }
+    },
+    "train_rows": 760,
+    "validation_rows": 191
+  },
+  "walk_forward_windows": 3,
+  "comparison_report_file": "comparison_report.json"
+}
