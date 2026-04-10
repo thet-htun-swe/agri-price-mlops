@@ -1,0 +1,1 @@
+CREATE DATABASE IF NOT EXISTS agri_mlops;
