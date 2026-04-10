@@ -2,6 +2,8 @@
 
 This document defines the proposal-aligned cloud ML pipeline for this project.
 
+Canonical execution path: SageMaker Studio notebook runbook.
+
 The key rule is:
 
 - Glue handles feature engineering
@@ -192,6 +194,7 @@ This stage is complete when:
 
 ## 15. Related Docs
 
+- [sagemaker_studio_notebook_runbook.md](/d:/AIT/MLOps/project/repos/agri-price-mlops/docs/sagemaker_studio_notebook_runbook.md)
 - [aws_glue_setup.md](/d:/AIT/MLOps/project/repos/agri-price-mlops/docs/aws_glue_setup.md)
 - [phase_c_setup.md](/d:/AIT/MLOps/project/repos/agri-price-mlops/docs/phase_c_setup.md)
 - [next_pipeline_steps.md](/d:/AIT/MLOps/project/repos/agri-price-mlops/docs/next_pipeline_steps.md)

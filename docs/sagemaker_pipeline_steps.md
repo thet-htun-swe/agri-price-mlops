@@ -2,6 +2,8 @@
 
 This guide is the practical step-by-step path for the proposal-aligned cloud ML pipeline.
 
+Primary run path: use the SageMaker Studio notebook runbook.
+
 Use this flow:
 
 1. keep Phase B in Glue
@@ -21,6 +23,7 @@ Code:
 Reference:
 
 - [sagemaker_pipeline_setup.md](/d:/AIT/MLOps/project/repos/agri-price-mlops/docs/sagemaker_pipeline_setup.md)
+- [sagemaker_studio_notebook_runbook.md](/d:/AIT/MLOps/project/repos/agri-price-mlops/docs/sagemaker_studio_notebook_runbook.md)
 
 ## What You Need To Do Manually
 

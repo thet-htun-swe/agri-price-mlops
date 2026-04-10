@@ -183,3 +183,7 @@ Only after the notebook creates a successful pipeline run:
 3. Athena actual-vs-predicted comparison
 4. CloudWatch monitoring
 5. EventBridge-triggered retraining
+
+Detailed runbook:
+
+- [sagemaker_inference_monitoring_runbook.md](/d:/AIT/MLOps/project/repos/agri-price-mlops/docs/sagemaker_inference_monitoring_runbook.md)
