@@ -34,3 +34,6 @@ artifacts
 
 proposal.docx
 playbook.docx
+
+# Temporary files
+tmp*
