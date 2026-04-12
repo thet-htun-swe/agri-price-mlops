@@ -1,3 +1,5 @@
+-- Registers curated prediction files in S3 as a queryable table; this is your “predicted” side.
+
 CREATE EXTERNAL TABLE IF NOT EXISTS agri_mlops.agri_predictions_curated (
   date string,
   target_next_day_price_coriander_pred double,

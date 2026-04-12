@@ -1,3 +1,5 @@
+-- After new prediction run folders arrive (run_date=...), refreshes partitions so Athena can query latest runs.
+
 SELECT
   run_date,
   AVG(ABS((actual_coriander - pred_coriander) / NULLIF(actual_coriander, 0))) * 100 AS mape_coriander,

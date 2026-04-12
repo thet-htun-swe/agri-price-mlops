@@ -1,3 +1,5 @@
+-- Joins actual and predicted rows by date, giving one unified comparison layer.\
+
 CREATE OR REPLACE VIEW agri_mlops.agri_actual_vs_pred AS
 SELECT
   a.date,

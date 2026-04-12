@@ -1,3 +1,5 @@
+-- Registers the processed features dataset in S3 as a queryable table; this is your “actual” side (ground truth targets).
+
 CREATE EXTERNAL TABLE IF NOT EXISTS agri_mlops.agri_features_actual (
   date string,
   target_next_day_price_coriander double,
