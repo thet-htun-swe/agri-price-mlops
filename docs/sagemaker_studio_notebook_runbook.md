@@ -187,3 +187,4 @@ Only after the notebook creates a successful pipeline run:
 Detailed runbook:
 
 - [sagemaker_inference_monitoring_runbook.md](/d:/AIT/MLOps/project/repos/agri-price-mlops/docs/sagemaker_inference_monitoring_runbook.md)
+- [production_inference_drift_pipeline_runbook.md](/d:/AIT/MLOps/project/repos/agri-price-mlops/docs/production_inference_drift_pipeline_runbook.md)
