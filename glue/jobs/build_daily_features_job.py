@@ -1,14 +1,17 @@
 from __future__ import annotations
 
 import argparse
+import io
 import json
 import logging
 import sys
 import tempfile
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
 import boto3
+import pandas as pd
 
 
 CURRENT_DIR = Path(__file__).resolve().parent
@@ -77,6 +80,17 @@ def build_parser() -> argparse.ArgumentParser:
         default="",
         help="Optional comma-separated list of columns that must exist in the final features dataset.",
     )
+    parser.add_argument(
+        "--inference-prefix",
+        default="inference/input",
+        help="S3 prefix root where daily inference input payload and manifest will be written.",
+    )
+    parser.add_argument(
+        "--inference-lookback-days",
+        type=int,
+        default=30,
+        help="How many most recent days to include in generated inference input payload.",
+    )
     return parser
 
 
@@ -126,6 +140,13 @@ def main() -> int:
             bucket=args.processed_bucket,
             prefix=args.processed_prefix,
         )
+    inference_meta = upload_inference_input_to_s3(
+        features=bundle.features,
+        s3_client=s3_client,
+        bucket=args.processed_bucket,
+        inference_prefix=args.inference_prefix,
+        lookback_days=args.inference_lookback_days,
+    )
 
     logger.info(
         json.dumps(
@@ -137,6 +158,10 @@ def main() -> int:
                 "clean_weather_rows": int(len(bundle.clean_weather)),
                 "features_rows": int(len(bundle.features)),
                 "validation_status": bundle.validation_report["status"],
+                "inference_run_date": inference_meta["run_date"],
+                "inference_rows": inference_meta["rows"],
+                "inference_payload_key": inference_meta["payload_key"],
+                "inference_manifest_key": inference_meta["manifest_key"],
             },
             ensure_ascii=False,
         )
@@ -238,6 +263,73 @@ def upload_bundle_to_s3(
         s3_client.upload_file(str(path), bucket, s3_key)
 
 
+def upload_inference_input_to_s3(
+    features: pd.DataFrame,
+    s3_client: Any,
+    bucket: str,
+    inference_prefix: str,
+    lookback_days: int,
+) -> dict[str, Any]:
+    run_date = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    root_prefix = inference_prefix.rstrip("/")
+    payload_key = f"{root_prefix}/run_date={run_date}/payload/features.jsonl"
+    manifest_key = f"{root_prefix}/run_date={run_date}/meta/input_manifest.parquet"
+
+    frame = features.copy()
+    frame["date"] = pd.to_datetime(frame["date"], errors="coerce")
+    frame = frame.dropna(subset=["date"]).sort_values("date").reset_index(drop=True)
+    if frame.empty:
+        raise ValueError("Features dataset is empty; cannot generate inference input.")
+
+    if lookback_days > 0:
+        cutoff = frame["date"].max() - pd.Timedelta(days=lookback_days)
+        frame = frame[frame["date"] > cutoff].copy().reset_index(drop=True)
+        if frame.empty:
+            raise ValueError(
+                f"No feature rows available in lookback window ({lookback_days} days) for inference input."
+            )
+
+    # Drop labels to avoid target leakage in inference payload.
+    target_columns = [c for c in frame.columns if c.startswith("target_next_day_")]
+    infer_frame = frame.drop(columns=target_columns, errors="ignore").copy()
+    infer_frame["date"] = infer_frame["date"].dt.strftime("%Y-%m-%d")
+
+    manifest = pd.DataFrame(
+        {
+            "row_id": range(len(infer_frame)),
+            "date": infer_frame["date"],
+            "run_date": run_date,
+        }
+    )
+
+    records = infer_frame.to_dict(orient="records")
+    jsonl_payload = "\n".join(
+        json.dumps({"instances": [record]}, ensure_ascii=False, default=str) for record in records
+    ) + "\n"
+
+    s3_client.put_object(
+        Bucket=bucket,
+        Key=payload_key,
+        Body=jsonl_payload.encode("utf-8"),
+        ContentType="application/json",
+    )
+
+    manifest_buffer = io.BytesIO()
+    manifest.to_parquet(manifest_buffer, index=False)
+    s3_client.put_object(
+        Bucket=bucket,
+        Key=manifest_key,
+        Body=manifest_buffer.getvalue(),
+        ContentType="application/octet-stream",
+    )
+
+    return {
+        "run_date": run_date,
+        "rows": int(len(infer_frame)),
+        "payload_key": payload_key,
+        "manifest_key": manifest_key,
+    }
+
+
 if __name__ == "__main__":
     main()
-
