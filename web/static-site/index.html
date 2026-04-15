@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Agri Price Daily Predictions</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <main class="container">
+    <header class="header">
+      <h1>Agri Price Daily Predictions</h1>
+      <p class="subtitle">Auto-updated from latest curated prediction snapshot</p>
+    </header>
+
+    <section class="meta card" id="metaCard">
+      <div class="meta-item">
+        <span class="label">Run Date</span>
+        <span class="value" id="runDate">-</span>
+      </div>
+      <div class="meta-item">
+        <span class="label">Generated (UTC)</span>
+        <span class="value" id="generatedAt">-</span>
+      </div>
+      <div class="meta-item">
+        <span class="label">Status</span>
+        <span class="value" id="status">Loading...</span>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2 id="predictionDateLabel">Daily Predicted Prices</h2>
+      <div class="kpi-grid" id="kpiGrid">
+        <div class="kpi-item"><span class="label">Coriander</span><span class="kpi-value" id="corianderValue">-</span><span class="unit" id="corianderUnit">THB/kg</span></div>
+        <div class="kpi-item"><span class="label">Kale</span><span class="kpi-value" id="kaleValue">-</span><span class="unit" id="kaleUnit">THB/kg</span></div>
+        <div class="kpi-item"><span class="label">Lime</span><span class="kpi-value" id="limeValue">-</span><span class="unit" id="limeUnit">THB/kg</span></div>
+        <div class="kpi-item"><span class="label">Orange</span><span class="kpi-value" id="orangeValue">-</span><span class="unit" id="orangeUnit">THB/kg</span></div>
+        <div class="kpi-item"><span class="label">Red Chili</span><span class="kpi-value" id="redChiliValue">-</span><span class="unit" id="redChiliUnit">THB/kg</span></div>
+      </div>
+    </section>
+  </main>
+
+  <script src="./app.js"></script>
+</body>
+</html>
