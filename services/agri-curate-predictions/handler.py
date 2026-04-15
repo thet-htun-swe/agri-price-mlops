@@ -11,6 +11,7 @@ s3 = boto3.client("s3", region_name=REGION)
 BUCKET = os.environ["BUCKET"]
 RAW_BASE = os.environ.get("RAW_BASE", "predictions/raw/")
 CURATED_BASE = os.environ.get("CURATED_BASE", "predictions/curated/")
+LATEST_BASE = os.environ.get("LATEST_BASE", "predictions/curated/latest/")
 META_BASE = os.environ.get("META_BASE", "inference/input/")
 MODEL_PACKAGE_GROUP = os.environ.get("MODEL_PACKAGE_GROUP", "agri-price-multi-output")
 
@@ -62,7 +63,36 @@ def lambda_handler(event, context):
 
     buf = BytesIO()
     curated.to_parquet(buf, index=False)
-    out_key = f"{curated_prefix}predictions.parquet"
-    s3.put_object(Bucket=BUCKET, Key=out_key, Body=buf.getvalue())
+    parquet_bytes = buf.getvalue()
 
-    return {"status": "ok", "run_date": run_date, "output": f"s3://{BUCKET}/{out_key}"}
+    out_key = f"{curated_prefix}predictions.parquet"
+    s3.put_object(Bucket=BUCKET, Key=out_key, Body=parquet_bytes)
+
+    latest_key = f"{LATEST_BASE.rstrip('/')}/predictions.parquet"
+    s3.put_object(Bucket=BUCKET, Key=latest_key, Body=parquet_bytes)
+
+    latest_json_key = f"{LATEST_BASE.rstrip('/')}/predictions.json"
+    latest_json_payload = json.dumps(
+        {
+            "run_date": run_date,
+            "generated_at_utc": datetime.now(timezone.utc).isoformat(),
+            "row_count": int(len(curated)),
+            "data": curated.to_dict(orient="records"),
+        },
+        ensure_ascii=False,
+        default=str,
+    ).encode("utf-8")
+    s3.put_object(
+        Bucket=BUCKET,
+        Key=latest_json_key,
+        Body=latest_json_payload,
+        ContentType="application/json",
+    )
+
+    return {
+        "status": "ok",
+        "run_date": run_date,
+        "output": f"s3://{BUCKET}/{out_key}",
+        "latest_output": f"s3://{BUCKET}/{latest_key}",
+        "latest_json_output": f"s3://{BUCKET}/{latest_json_key}",
+    }

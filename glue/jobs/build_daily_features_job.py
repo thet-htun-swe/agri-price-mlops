@@ -88,8 +88,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--inference-lookback-days",
         type=int,
-        default=30,
-        help="How many most recent days to include in generated inference input payload.",
+        default=1,
+        help="How many most recent days to include in generated inference input payload (default 1 for daily inference).",
     )
     return parser
 
