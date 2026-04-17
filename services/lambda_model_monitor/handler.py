@@ -16,6 +16,10 @@ SELECT
 FROM agri_actual_vs_pred
 WHERE run_date = (SELECT MAX(run_date) FROM agri_actual_vs_pred)
 """
+REPAIR_QUERIES = (
+    "MSCK REPAIR TABLE agri_predictions_curated",
+    "MSCK REPAIR TABLE agri_features_actual",
+)
 
 def _to_float(v):
     return float(v) if v not in (None, "") else None
@@ -33,6 +37,28 @@ def _wait_for_query(query_execution_id, poll_seconds=2, timeout_seconds=120):
             )
         time.sleep(poll_seconds)
 
+
+def _execute_query_and_wait(*, query_string, database, output_s3, workgroup, poll_seconds, timeout_seconds):
+    start = athena.start_query_execution(
+        QueryString=query_string,
+        QueryExecutionContext={"Database": database},
+        ResultConfiguration={"OutputLocation": output_s3},
+        WorkGroup=workgroup,
+    )
+    query_execution_id = start["QueryExecutionId"]
+    query = _wait_for_query(
+        query_execution_id=query_execution_id,
+        poll_seconds=poll_seconds,
+        timeout_seconds=timeout_seconds,
+    )
+    status = query["Status"]["State"]
+    if status != "SUCCEEDED":
+        reason = query["Status"].get("StateChangeReason", "Unknown Athena failure reason")
+        raise RuntimeError(
+            f"Athena query failed. status={status}, reason={reason}, query_execution_id={query_execution_id}"
+        )
+    return query_execution_id
+
 def lambda_handler(event, context):
     database = os.environ["ATHENA_DATABASE"]
     output_s3 = os.environ["ATHENA_OUTPUT_S3"]
@@ -42,22 +68,26 @@ def lambda_handler(event, context):
     poll_seconds = int(os.environ.get("ATHENA_POLL_SECONDS", "2"))
     timeout_seconds = int(os.environ.get("ATHENA_TIMEOUT_SECONDS", "120"))
 
-    q = athena.start_query_execution(
-        QueryString=SQL,
-        QueryExecutionContext={"Database": database},
-        ResultConfiguration={"OutputLocation": output_s3},
-        WorkGroup=workgroup,
-    )
-    qid = q["QueryExecutionId"]
-    query = _wait_for_query(
-        query_execution_id=qid,
+    repair_query_ids = []
+    for repair_sql in REPAIR_QUERIES:
+        repair_qid = _execute_query_and_wait(
+            query_string=repair_sql,
+            database=database,
+            output_s3=output_s3,
+            workgroup=workgroup,
+            poll_seconds=poll_seconds,
+            timeout_seconds=timeout_seconds,
+        )
+        repair_query_ids.append(repair_qid)
+
+    qid = _execute_query_and_wait(
+        query_string=SQL,
+        database=database,
+        output_s3=output_s3,
+        workgroup=workgroup,
         poll_seconds=poll_seconds,
         timeout_seconds=timeout_seconds,
     )
-    status = query["Status"]["State"]
-    if status != "SUCCEEDED":
-        reason = query["Status"].get("StateChangeReason", "Unknown Athena failure reason")
-        raise RuntimeError(f"Athena query status={status}, reason={reason}")
 
     rows = athena.get_query_results(QueryExecutionId=qid)["ResultSet"]["Rows"]
     if len(rows) < 2:
@@ -94,6 +124,7 @@ def lambda_handler(event, context):
         "status": "published",
         "overall_mape": overall_mape,
         "query_execution_id": qid,
+        "repair_query_execution_ids": repair_query_ids,
         "region": REGION,
         "workgroup": workgroup,
     }
